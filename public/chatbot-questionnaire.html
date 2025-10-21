@@ -1,0 +1,1448 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chatbot Implementation - Discovery Questionnaire</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 20px;
+        color: #333;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+      }
+
+      .header {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        color: white;
+        padding: 40px;
+        text-align: center;
+      }
+
+      .header h1 {
+        font-size: 2.5em;
+        margin-bottom: 10px;
+      }
+
+      .header p {
+        font-size: 1.2em;
+        opacity: 0.9;
+      }
+
+      /* Workflow Diagram Section */
+      .diagram-section {
+        background: #f8f9fa;
+        padding: 40px;
+        border-bottom: 3px solid #11998e;
+      }
+
+      .diagram-title {
+        text-align: center;
+        font-size: 2em;
+        color: #11998e;
+        margin-bottom: 30px;
+      }
+
+      .workflow {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .workflow-step {
+        display: flex;
+        align-items: center;
+        gap: 30px;
+        width: 100%;
+        max-width: 900px;
+      }
+
+      .step-main {
+        background: white;
+        border: 3px solid #11998e;
+        border-radius: 10px;
+        padding: 20px 30px;
+        min-width: 250px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .step-main:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      .step-main.user-step {
+        background: #e8f5e9;
+        border-color: #4caf50;
+        border-radius: 50px;
+      }
+
+      .step-main h3 {
+        font-size: 1.3em;
+        color: #333;
+        margin-bottom: 5px;
+      }
+
+      .step-main p {
+        color: #666;
+        font-size: 0.95em;
+      }
+
+      .step-details {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        flex: 1;
+      }
+
+      .detail-box {
+        background: white;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        padding: 12px 18px;
+        font-size: 0.9em;
+        color: #555;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      }
+
+      .arrow {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #11998e;
+        font-size: 2em;
+        align-self: flex-start;
+        margin-left: 125px;
+      }
+
+      /* Questionnaire Section */
+      .questionnaire-section {
+        padding: 40px;
+      }
+
+      .section {
+        margin-bottom: 40px;
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 30px;
+        border-left: 5px solid #11998e;
+      }
+
+      .section-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 25px;
+      }
+
+      .section-number {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        color: white;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1.2em;
+      }
+
+      .section-title {
+        font-size: 1.8em;
+        color: #333;
+      }
+
+      .question {
+        margin-bottom: 25px;
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid #e0e0e0;
+      }
+
+      .question-label {
+        font-weight: 600;
+        color: #444;
+        margin-bottom: 12px;
+        font-size: 1.1em;
+      }
+
+      .question-options {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-left: 10px;
+      }
+
+      .option {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 0;
+      }
+
+      .option input[type="checkbox"],
+      .option input[type="radio"] {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+      }
+
+      .option label {
+        cursor: pointer;
+        color: #555;
+      }
+
+      .text-input {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #ddd;
+        border-radius: 6px;
+        font-size: 1em;
+        margin-top: 10px;
+        transition: border-color 0.3s ease;
+      }
+
+      .text-input:focus {
+        outline: none;
+        border-color: #11998e;
+      }
+
+      textarea.text-input {
+        min-height: 100px;
+        resize: vertical;
+        font-family: inherit;
+      }
+
+      .star-indicator {
+        color: #f39c12;
+        margin-left: 5px;
+      }
+
+      .footer {
+        background: #2c3e50;
+        color: white;
+        padding: 30px;
+        text-align: center;
+      }
+
+      .footer p {
+        margin-bottom: 10px;
+      }
+
+      @media (max-width: 768px) {
+        .workflow-step {
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        .step-details {
+          width: 100%;
+        }
+
+        .arrow {
+          margin-left: 0;
+          transform: rotate(90deg);
+        }
+
+        .header h1 {
+          font-size: 1.8em;
+        }
+
+        .section-title {
+          font-size: 1.4em;
+        }
+      }
+
+      .loop-arrow {
+        width: 100%;
+        max-width: 900px;
+        display: flex;
+        justify-content: flex-start;
+        padding-left: 50px;
+        margin-top: -10px;
+      }
+
+      .loop-arrow svg {
+        width: 80px;
+        height: 100px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Header -->
+      <div class="header">
+        <h1>Chatbot Implementation</h1>
+        <p>Client Discovery Questionnaire</p>
+      </div>
+
+      <!-- Workflow Diagram Section -->
+      <div class="diagram-section">
+        <h2 class="diagram-title">Chatbot Workflow Architecture</h2>
+
+        <div class="workflow">
+          <!-- Step 1: User Input -->
+          <div class="workflow-step">
+            <div class="step-main user-step">
+              <h3>User Types a Message</h3>
+              <p>Customer sends text message</p>
+            </div>
+          </div>
+
+          <div class="arrow">↓</div>
+
+          <!-- Step 2: Front-End -->
+          <div class="workflow-step">
+            <div class="step-main">
+              <h3>Front-End UI</h3>
+              <p>Chat Interface</p>
+            </div>
+            <div class="step-details">
+              <div class="detail-box">Input validation</div>
+              <div class="detail-box">Message formatting</div>
+              <div class="detail-box">Display chat history</div>
+              <div class="detail-box">Show typing indicator</div>
+            </div>
+          </div>
+
+          <div class="arrow">↓</div>
+
+          <!-- Step 3: Backend -->
+          <div class="workflow-step">
+            <div class="step-main">
+              <h3>Back-End/Chatbot Engine</h3>
+              <p>Message Processing</p>
+            </div>
+            <div class="step-details">
+              <div class="detail-box">Session management</div>
+              <div class="detail-box">Message queue</div>
+              <div class="detail-box">Authentication</div>
+              <div class="detail-box">API gateway</div>
+            </div>
+          </div>
+
+          <div class="arrow">↓</div>
+
+          <!-- Step 4: AI Processing -->
+          <div class="workflow-step">
+            <div class="step-main">
+              <h3>AI/LLM (ChatGPT/Claude)</h3>
+              <p>Response Generation</p>
+            </div>
+            <div class="step-details">
+              <div class="detail-box">Context/Memory storage</div>
+              <div class="detail-box">User preferences</div>
+              <div class="detail-box">Knowledge base</div>
+              <div class="detail-box">Prompt engineering layer</div>
+            </div>
+          </div>
+
+          <div class="arrow">↓</div>
+
+          <!-- Step 5: Response Logic -->
+          <div class="workflow-step">
+            <div class="step-main">
+              <h3>Response Logic</h3>
+              <p>Formatting & Actions</p>
+            </div>
+            <div class="step-details">
+              <div class="detail-box">Markdown/rich text formatting</div>
+              <div class="detail-box">Button actions & quick replies</div>
+              <div class="detail-box">External API calls</div>
+            </div>
+          </div>
+
+          <div class="arrow">↓</div>
+
+          <!-- Step 6: Display -->
+          <div class="workflow-step">
+            <div class="step-main user-step">
+              <h3>Display Message to User</h3>
+              <p>Customer sees response</p>
+            </div>
+          </div>
+
+          <!-- Loop Arrow -->
+          <div class="loop-arrow">
+            <svg
+              viewBox="0 0 100 120"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M 50 10 Q 10 10 10 50 Q 10 90 50 90 L 50 70 M 50 90 L 40 80 M 50 90 L 60 80"
+                stroke="#11998e"
+                stroke-width="3"
+                fill="none"
+                stroke-linecap="round"
+              />
+              <text
+                x="15"
+                y="55"
+                fill="#11998e"
+                font-size="12"
+                font-weight="bold"
+              >
+                Continue
+              </text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Questionnaire Section -->
+      <div class="questionnaire-section">
+        <!-- Section 1 -->
+        <div class="section">
+          <div class="section-header">
+            <div class="section-number">1</div>
+            <h2 class="section-title">Project Overview</h2>
+          </div>
+
+          <div class="question">
+            <div class="question-label">
+              1.1 What is the main purpose of this chatbot?
+            </div>
+            <div class="question-options">
+              <div class="option">
+                <input type="checkbox" id="purpose1" />
+                <label for="purpose1">Customer support</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="purpose2" />
+                <label for="purpose2">Sales/Lead generation</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="purpose3" />
+                <label for="purpose3">Appointment scheduling</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="purpose4" />
+                <label for="purpose4">Information delivery/FAQ</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="purpose5" />
+                <label for="purpose5">Product recommendations</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="purpose6" />
+                <label for="purpose6">Internal employee assistance</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="purpose7" />
+                <label for="purpose7">Other:</label>
+                <input
+                  type="text"
+                  class="text-input"
+                  placeholder="Please specify"
+                  style="max-width: 300px"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="question">
+            <div class="question-label">
+              1.2 What problem are you trying to solve?
+            </div>
+            <textarea
+              class="text-input"
+              placeholder="Describe the problem..."
+            ></textarea>
+          </div>
+
+          <div class="question">
+            <div class="question-label">1.3 What does success look like?</div>
+            <textarea
+              class="text-input"
+              placeholder="e.g., reduce response time, increase conversions, handle common questions..."
+            ></textarea>
+          </div>
+        </div>
+
+        <!-- Section 2 -->
+        <div class="section">
+          <div class="section-header">
+            <div class="section-number">2</div>
+            <h2 class="section-title">
+              Platform & Deployment <span class="star-indicator">⭐</span>
+            </h2>
+          </div>
+
+          <div class="question">
+            <div class="question-label">2.1 Where will the chatbot live?</div>
+            <div class="question-options">
+              <div class="option">
+                <input type="checkbox" id="platform1" />
+                <label for="platform1">Website (embedded widget)</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="platform2" />
+                <label for="platform2">Mobile app (iOS/Android)</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="platform3" />
+                <label for="platform3">Facebook Messenger</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="platform4" />
+                <label for="platform4">WhatsApp Business</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="platform5" />
+                <label for="platform5">Slack</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="platform6" />
+                <label for="platform6">Microsoft Teams</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="platform7" />
+                <label for="platform7">SMS/Text messaging</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="platform8" />
+                <label for="platform8">Other:</label>
+                <input
+                  type="text"
+                  class="text-input"
+                  placeholder="Please specify"
+                  style="max-width: 300px"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="question">
+            <div class="question-label">2.2 Expected conversation volume:</div>
+            <input
+              type="text"
+              class="text-input"
+              placeholder="Approximately ___ conversations per day"
+            />
+            <input
+              type="text"
+              class="text-input"
+              placeholder="Peak times: ___"
+            />
+          </div>
+
+          <div class="question">
+            <div class="question-label">2.3 Who is the primary audience?</div>
+            <div class="question-options">
+              <div class="option">
+                <input type="checkbox" id="audience1" />
+                <label for="audience1">Customers (B2C)</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="audience2" />
+                <label for="audience2">Businesses (B2B)</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="audience3" />
+                <label for="audience3">Internal employees</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="audience4" />
+                <label for="audience4">Partners/vendors</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 3 -->
+        <div class="section">
+          <div class="section-header">
+            <div class="section-number">3</div>
+            <h2 class="section-title">Conversation Design</h2>
+          </div>
+
+          <div class="question">
+            <div class="question-label">
+              3.1 How complex is the conversation?
+            </div>
+            <div class="question-options">
+              <div class="option">
+                <input type="radio" name="complexity" id="complexity1" />
+                <label for="complexity1"
+                  >Simple & straightforward (e.g., "What are your
+                  hours?")</label
+                >
+              </div>
+              <div class="option">
+                <input type="radio" name="complexity" id="complexity2" />
+                <label for="complexity2"
+                  >Moderate (some back-and-forth, handle a few scenarios)</label
+                >
+              </div>
+              <div class="option">
+                <input type="radio" name="complexity" id="complexity3" />
+                <label for="complexity3"
+                  >Complex (dynamic conversation, many possible paths)</label
+                >
+              </div>
+            </div>
+          </div>
+
+          <div class="question">
+            <div class="question-label">
+              3.2 Do you have a conversation flow or script already?
+            </div>
+            <div class="question-options">
+              <div class="option">
+                <input type="radio" name="script" id="script1" />
+                <label for="script1">Yes, we have a detailed script</label>
+              </div>
+              <div class="option">
+                <input type="radio" name="script" id="script2" />
+                <label for="script2">We have a rough outline</label>
+              </div>
+              <div class="option">
+                <input type="radio" name="script" id="script3" />
+                <label for="script3">No, need help creating one</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="question">
+            <div class="question-label">
+              3.3 What languages does the chatbot need to support?
+            </div>
+            <input
+              type="text"
+              class="text-input"
+              placeholder="Primary language: ___"
+            />
+            <input
+              type="text"
+              class="text-input"
+              placeholder="Additional languages: ___"
+            />
+          </div>
+
+          <div class="question">
+            <div class="question-label">3.4 Tone & personality:</div>
+            <div class="question-options">
+              <div class="option">
+                <input type="radio" name="tone" id="tone1" />
+                <label for="tone1">Professional & formal</label>
+              </div>
+              <div class="option">
+                <input type="radio" name="tone" id="tone2" />
+                <label for="tone2">Friendly & casual</label>
+              </div>
+              <div class="option">
+                <input type="radio" name="tone" id="tone3" />
+                <label for="tone3">Fun & playful</label>
+              </div>
+              <div class="option">
+                <input type="radio" name="tone" id="tone4" />
+                <label for="tone4">Other:</label>
+                <input
+                  type="text"
+                  class="text-input"
+                  placeholder="Describe personality"
+                  style="max-width: 300px"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="question">
+            <div class="question-label">
+              3.5 Should conversations feel natural/conversational or more
+              structured/menu-driven?
+            </div>
+            <div class="question-options">
+              <div class="option">
+                <input type="radio" name="conversation-style" id="conv1" />
+                <label for="conv1">Natural, AI-driven conversation</label>
+              </div>
+              <div class="option">
+                <input type="radio" name="conversation-style" id="conv2" />
+                <label for="conv2">Structured with buttons/quick replies</label>
+              </div>
+              <div class="option">
+                <input type="radio" name="conversation-style" id="conv3" />
+                <label for="conv3">Hybrid approach</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 4 -->
+        <div class="section">
+          <div class="section-header">
+            <div class="section-number">4</div>
+            <h2 class="section-title">Information & Actions</h2>
+          </div>
+
+          <div class="question">
+            <div class="question-label">
+              4.1 What information does the chatbot need to collect from users?
+            </div>
+            <textarea
+              class="text-input"
+              placeholder="e.g., name, email, phone, preferences, order number, etc."
+            ></textarea>
+          </div>
+
+          <div class="question">
+            <div class="question-label">
+              4.2 What information should the chatbot provide?
+            </div>
+            <textarea
+              class="text-input"
+              placeholder="e.g., product info, pricing, order status, FAQs, etc."
+            ></textarea>
+          </div>
+
+          <div class="question">
+            <div class="question-label">
+              4.3 Should the chatbot take actions?
+            </div>
+            <div class="question-options">
+              <div class="option">
+                <input type="checkbox" id="action1" />
+                <label for="action1">Schedule/modify appointments</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="action2" />
+                <label for="action2">Update customer records</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="action3" />
+                <label for="action3">Send emails or notifications</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="action4" />
+                <label for="action4">Process orders/payments</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="action5" />
+                <label for="action5">Create support tickets</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="action6" />
+                <label for="action6">Search/filter products</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="action7" />
+                <label for="action7">No actions needed</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="action8" />
+                <label for="action8">Other:</label>
+                <input
+                  type="text"
+                  class="text-input"
+                  placeholder="Please specify"
+                  style="max-width: 300px"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="question">
+            <div class="question-label">
+              4.4 Does the chatbot need access to existing systems?
+            </div>
+            <div class="question-options">
+              <div class="option">
+                <input type="checkbox" id="system1" />
+                <label for="system1">CRM (which one:</label>
+                <input
+                  type="text"
+                  class="text-input"
+                  placeholder="Name"
+                  style="max-width: 200px"
+                />
+                <label>)</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="system2" />
+                <label for="system2">E-commerce platform (which one:</label>
+                <input
+                  type="text"
+                  class="text-input"
+                  placeholder="Name"
+                  style="max-width: 200px"
+                />
+                <label>)</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="system3" />
+                <label for="system3">Help desk/ticketing system</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="system4" />
+                <label for="system4">Customer database</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="system5" />
+                <label for="system5">Payment gateway</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="system6" />
+                <label for="system6">Not needed</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="system7" />
+                <label for="system7">Other:</label>
+                <input
+                  type="text"
+                  class="text-input"
+                  placeholder="Please specify"
+                  style="max-width: 300px"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 5 -->
+        <div class="section">
+          <div class="section-header">
+            <div class="section-number">5</div>
+            <h2 class="section-title">Intelligence & Memory</h2>
+          </div>
+
+          <div class="question">
+            <div class="question-label">
+              5.1 Should the chatbot access user history/previous conversations?
+            </div>
+            <div class="question-options">
+              <div class="option">
+                <input type="radio" name="history" id="history1" />
+                <label for="history1">Yes, pull from existing system</label>
+              </div>
+              <div class="option">
+                <input type="radio" name="history" id="history2" />
+                <label for="history2">Yes, remember within this project</label>
+              </div>
+              <div class="option">
+                <input type="radio" name="history" id="history3" />
+                <label for="history3"
+                  >No, treat each conversation independently</label
+                >
+              </div>
+            </div>
+          </div>
+
+          <div class="question">
+            <div class="question-label">
+              5.2 Does the chatbot need a knowledge base?
+            </div>
+            <div class="question-options">
+              <div class="option">
+                <input type="checkbox" id="kb1" />
+                <label for="kb1">Yes - FAQs/product information</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="kb2" />
+                <label for="kb2">Yes - company policies/procedures</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="kb3" />
+                <label for="kb3">Yes - technical documentation</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="kb4" />
+                <label for="kb4">Yes - internal wikis/resources</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="kb5" />
+                <label for="kb5">No, basic responses only</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="question">
+            <div class="question-label">
+              5.3 How should the chatbot handle things it doesn't know?
+            </div>
+            <div class="question-options">
+              <div class="option">
+                <input type="radio" name="unknown" id="unknown1" />
+                <label for="unknown1">Escalate to human agent</label>
+              </div>
+              <div class="option">
+                <input type="radio" name="unknown" id="unknown2" />
+                <label for="unknown2">Collect info and create ticket</label>
+              </div>
+              <div class="option">
+                <input type="radio" name="unknown" id="unknown3" />
+                <label for="unknown3">Provide general/related response</label>
+              </div>
+              <div class="option">
+                <input type="radio" name="unknown" id="unknown4" />
+                <label for="unknown4">Other:</label>
+                <input
+                  type="text"
+                  class="text-input"
+                  placeholder="Please specify"
+                  style="max-width: 300px"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 6 -->
+        <div class="section">
+          <div class="section-header">
+            <div class="section-number">6</div>
+            <h2 class="section-title">Human Handoff</h2>
+          </div>
+
+          <div class="question">
+            <div class="question-label">
+              6.1 Can the chatbot escalate to human agents?
+            </div>
+            <div class="question-options">
+              <div class="option">
+                <input type="radio" name="transfer" id="transfer1" />
+                <label for="transfer1">Yes, always available</label>
+              </div>
+              <div class="option">
+                <input type="radio" name="transfer" id="transfer2" />
+                <label for="transfer2">Yes, during business hours only</label>
+              </div>
+              <div class="option">
+                <input type="radio" name="transfer" id="transfer3" />
+                <label for="transfer3">No, handle all conversations</label>
+              </div>
+              <div class="option">
+                <input type="radio" name="transfer" id="transfer4" />
+                <label for="transfer4">Only for specific situations:</label>
+                <input
+                  type="text"
+                  class="text-input"
+                  placeholder="Specify"
+                  style="max-width: 300px"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="question">
+            <div class="question-label">
+              6.2 When should the chatbot escalate to a human?
+            </div>
+            <div class="question-options">
+              <div class="option">
+                <input type="checkbox" id="when1" />
+                <label for="when1">User requests it</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="when2" />
+                <label for="when2"
+                  >Chatbot can't understand (after a few tries)</label
+                >
+              </div>
+              <div class="option">
+                <input type="checkbox" id="when3" />
+                <label for="when3">Complex/escalated issues</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="when4" />
+                <label for="when4">Negative sentiment detected</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="when5" />
+                <label for="when5">Never</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="when6" />
+                <label for="when6">Other:</label>
+                <input
+                  type="text"
+                  class="text-input"
+                  placeholder="Please specify"
+                  style="max-width: 300px"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="question">
+            <div class="question-label">6.3 How should handoff work?</div>
+            <div class="question-options">
+              <div class="option">
+                <input type="radio" name="handoff" id="handoff1" />
+                <label for="handoff1"
+                  >Seamless transfer to live chat (with conversation
+                  history)</label
+                >
+              </div>
+              <div class="option">
+                <input type="radio" name="handoff" id="handoff2" />
+                <label for="handoff2"
+                  >Create ticket and notify support team</label
+                >
+              </div>
+              <div class="option">
+                <input type="radio" name="handoff" id="handoff3" />
+                <label for="handoff3">Email follow-up</label>
+              </div>
+              <div class="option">
+                <input type="radio" name="handoff" id="handoff4" />
+                <label for="handoff4">Phone callback</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 7 -->
+        <div class="section">
+          <div class="section-header">
+            <div class="section-number">7</div>
+            <h2 class="section-title">UI/UX Preferences</h2>
+          </div>
+
+          <div class="question">
+            <div class="question-label">
+              7.1 What visual style do you prefer?
+            </div>
+            <div class="question-options">
+              <div class="option">
+                <input type="radio" name="style" id="style1" />
+                <label for="style1">Match our website/brand colors</label>
+              </div>
+              <div class="option">
+                <input type="radio" name="style" id="style2" />
+                <label for="style2">Modern & minimal</label>
+              </div>
+              <div class="option">
+                <input type="radio" name="style" id="style3" />
+                <label for="style3">Fun & colorful</label>
+              </div>
+              <div class="option">
+                <input type="radio" name="style" id="style4" />
+                <label for="style4">No preference</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="question">
+            <div class="question-label">
+              7.2 What features should the chat widget have?
+            </div>
+            <div class="question-options">
+              <div class="option">
+                <input type="checkbox" id="feature1" />
+                <label for="feature1">Typing indicators</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="feature2" />
+                <label for="feature2">Read receipts</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="feature3" />
+                <label for="feature3">File/image upload</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="feature4" />
+                <label for="feature4">Quick reply buttons</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="feature5" />
+                <label for="feature5">Emoji support</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="feature6" />
+                <label for="feature6"
+                  >Rich media (images, videos, carousels)</label
+                >
+              </div>
+              <div class="option">
+                <input type="checkbox" id="feature7" />
+                <label for="feature7">Chat history persistence</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="question">
+            <div class="question-label">
+              7.3 Should the chatbot have an avatar or name?
+            </div>
+            <div class="question-options">
+              <div class="option">
+                <input type="radio" name="avatar" id="avatar1" />
+                <label for="avatar1">Yes, with a personality/name</label>
+                <input
+                  type="text"
+                  class="text-input"
+                  placeholder="Name suggestion"
+                  style="max-width: 200px"
+                />
+              </div>
+              <div class="option">
+                <input type="radio" name="avatar" id="avatar2" />
+                <label for="avatar2">Generic assistant</label>
+              </div>
+              <div class="option">
+                <input type="radio" name="avatar" id="avatar3" />
+                <label for="avatar3">No avatar/name needed</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 8 -->
+        <div class="section">
+          <div class="section-header">
+            <div class="section-number">8</div>
+            <h2 class="section-title">Technical Preferences</h2>
+          </div>
+
+          <div class="question">
+            <div class="question-label">
+              8.1 Do you have an existing chat platform or tool?
+            </div>
+            <div class="question-options">
+              <div class="option">
+                <input type="radio" name="existing" id="existing1" />
+                <label for="existing1">Yes:</label>
+                <input
+                  type="text"
+                  class="text-input"
+                  placeholder="Platform name"
+                  style="max-width: 300px"
+                />
+              </div>
+              <div class="option">
+                <input type="radio" name="existing" id="existing2" />
+                <label for="existing2">No, need recommendation</label>
+              </div>
+              <div class="option">
+                <input type="radio" name="existing" id="existing3" />
+                <label for="existing3">Open to changing</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="question">
+            <div class="question-label">8.2 Where should the system run?</div>
+            <div class="question-options">
+              <div class="option">
+                <input type="radio" name="hosting" id="hosting1" />
+                <label for="hosting1">Cloud (AWS, Google, Azure)</label>
+              </div>
+              <div class="option">
+                <input type="radio" name="hosting" id="hosting2" />
+                <label for="hosting2">On-premise</label>
+              </div>
+              <div class="option">
+                <input type="radio" name="hosting" id="hosting3" />
+                <label for="hosting3">No preference</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="question">
+            <div class="question-label">
+              8.3 Do you have preferences for AI technologies?
+            </div>
+            <div class="question-options">
+              <div class="option">
+                <input type="radio" name="tech" id="tech1" />
+                <label for="tech1">No preference (you decide)</label>
+              </div>
+              <div class="option">
+                <input type="radio" name="tech" id="tech2" />
+                <label for="tech2">Must use specific providers:</label>
+                <input
+                  type="text"
+                  class="text-input"
+                  placeholder="Specify"
+                  style="max-width: 300px"
+                />
+              </div>
+              <div class="option">
+                <input type="radio" name="tech" id="tech3" />
+                <label for="tech3"
+                  >Budget-conscious (cost-effective options)</label
+                >
+              </div>
+              <div class="option">
+                <input type="radio" name="tech" id="tech4" />
+                <label for="tech4">Quality-focused (best available)</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 9 -->
+        <div class="section">
+          <div class="section-header">
+            <div class="section-number">9</div>
+            <h2 class="section-title">Compliance & Security</h2>
+          </div>
+
+          <div class="question">
+            <div class="question-label">
+              9.1 Are there industry regulations to follow?
+            </div>
+            <div class="question-options">
+              <div class="option">
+                <input type="checkbox" id="reg1" />
+                <label for="reg1">Healthcare (HIPAA)</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="reg2" />
+                <label for="reg2">Finance (PCI, SOC 2)</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="reg3" />
+                <label for="reg3">GDPR (EU data privacy)</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="reg4" />
+                <label for="reg4">COPPA (children's privacy)</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="reg5" />
+                <label for="reg5">None</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="reg6" />
+                <label for="reg6">Other:</label>
+                <input
+                  type="text"
+                  class="text-input"
+                  placeholder="Please specify"
+                  style="max-width: 300px"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="question">
+            <div class="question-label">
+              9.2 Should conversations be recorded and/or saved?
+            </div>
+            <div class="question-options">
+              <div class="option">
+                <input type="checkbox" id="record1" />
+                <label for="record1">Save all conversations</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="record2" />
+                <label for="record2">Save for limited time (specify:</label>
+                <input
+                  type="text"
+                  class="text-input"
+                  placeholder="e.g., 30 days"
+                  style="max-width: 150px"
+                />
+                <label>)</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="record3" />
+                <label for="record3">Don't save conversations</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="record4" />
+                <label for="record4">Let users opt out</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="question">
+            <div class="question-label">9.3 Data privacy requirements:</div>
+            <div class="question-options">
+              <div class="option">
+                <input type="checkbox" id="privacy1" />
+                <label for="privacy1">End-to-end encryption</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="privacy2" />
+                <label for="privacy2">User authentication required</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="privacy3" />
+                <label for="privacy3"
+                  >Data stored in specific region/country</label
+                >
+              </div>
+              <div class="option">
+                <input type="checkbox" id="privacy4" />
+                <label for="privacy4"
+                  >PII (Personal Identifiable Information) handling</label
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 10 -->
+        <div class="section">
+          <div class="section-header">
+            <div class="section-number">10</div>
+            <h2 class="section-title">Budget & Timeline</h2>
+          </div>
+
+          <div class="question">
+            <div class="question-label">10.1 What's your timeline?</div>
+            <input
+              type="text"
+              class="text-input"
+              placeholder="Target launch: ___"
+            />
+            <div class="question-options" style="margin-top: 10px">
+              <div class="option">
+                <input type="checkbox" id="timeline1" />
+                <label for="timeline1">Urgent (ASAP)</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="timeline2" />
+                <label for="timeline2">Flexible</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="question">
+            <div class="question-label">10.2 Budget range:</div>
+            <div class="question-options">
+              <div class="option">
+                <input type="radio" name="budget" id="budget1" />
+                <label for="budget1">Under $10K</label>
+              </div>
+              <div class="option">
+                <input type="radio" name="budget" id="budget2" />
+                <label for="budget2">$10K - $50K</label>
+              </div>
+              <div class="option">
+                <input type="radio" name="budget" id="budget3" />
+                <label for="budget3">$50K - $100K</label>
+              </div>
+              <div class="option">
+                <input type="radio" name="budget" id="budget4" />
+                <label for="budget4">$100K+</label>
+              </div>
+              <div class="option">
+                <input type="radio" name="budget" id="budget5" />
+                <label for="budget5">Not sure yet</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="question">
+            <div class="question-label">10.3 Testing approach:</div>
+            <div class="question-options">
+              <div class="option">
+                <input type="radio" name="testing" id="testing1" />
+                <label for="testing1">Start with small pilot/beta</label>
+              </div>
+              <div class="option">
+                <input type="radio" name="testing" id="testing2" />
+                <label for="testing2">Full launch immediately</label>
+              </div>
+              <div class="option">
+                <input type="radio" name="testing" id="testing3" />
+                <label for="testing3"
+                  >Phased rollout (by department/region)</label
+                >
+              </div>
+              <div class="option">
+                <input type="radio" name="testing" id="testing4" />
+                <label for="testing4">Not sure</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 11 -->
+        <div class="section">
+          <div class="section-header">
+            <div class="section-number">11</div>
+            <h2 class="section-title">Success Metrics</h2>
+          </div>
+
+          <div class="question">
+            <div class="question-label">
+              11.1 How will you measure if this is working?
+            </div>
+            <textarea
+              class="text-input"
+              placeholder="e.g., customer satisfaction, response time, resolution rate, conversions, etc."
+            ></textarea>
+          </div>
+
+          <div class="question">
+            <div class="question-label">
+              11.2 What analytics/reporting do you need?
+            </div>
+            <div class="question-options">
+              <div class="option">
+                <input type="checkbox" id="analytics1" />
+                <label for="analytics1">Conversation volume/trends</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="analytics2" />
+                <label for="analytics2">Common questions/intents</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="analytics3" />
+                <label for="analytics3">User satisfaction scores</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="analytics4" />
+                <label for="analytics4">Response/resolution time</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="analytics5" />
+                <label for="analytics5"
+                  >Containment rate (% handled without human)</label
+                >
+              </div>
+              <div class="option">
+                <input type="checkbox" id="analytics6" />
+                <label for="analytics6">Conversion/goal completion</label>
+              </div>
+              <div class="option">
+                <input type="checkbox" id="analytics7" />
+                <label for="analytics7">Conversation transcripts</label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="footer">
+        <p><strong>Chatbot Implementation Discovery</strong></p>
+        <p>Total Questions: 35 | Estimated Time: 25-35 minutes</p>
+        <p style="margin-top: 15px; font-size: 0.9em; opacity: 0.8">
+          This questionnaire helps us understand your requirements and design
+          the perfect chatbot solution for your needs.
+        </p>
+      </div>
+    </div>
+    
+    <!-- Form submission handler -->
+    <script src="/js/form-handler.js"></script>
+  </body>
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Agent Discovery Questionnaires</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 900px;
+        background: white;
+        border-radius: 20px;
+        padding: 60px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        text-align: center;
+      }
+
+      h1 {
+        font-size: 3em;
+        color: #333;
+        margin-bottom: 20px;
+      }
+
+      p {
+        font-size: 1.3em;
+        color: #666;
+        margin-bottom: 50px;
+        line-height: 1.6;
+      }
+
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 40px;
+        margin-top: 40px;
+      }
+
+      .card {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        padding: 40px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        cursor: pointer;
+      }
+
+      .card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+      }
+
+      .card.voice {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+      }
+
+      .card.chatbot {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        color: white;
+      }
+
+      .card h2 {
+        font-size: 2em;
+        margin-bottom: 20px;
+      }
+
+      .card p {
+        font-size: 1.1em;
+        margin-bottom: 30px;
+        color: rgba(255, 255, 255, 0.9);
+      }
+
+      .card.voice p,
+      .card.chatbot p {
+        color: rgba(255, 255, 255, 0.95);
+      }
+
+      .btn {
+        display: inline-block;
+        padding: 15px 40px;
+        background: white;
+        color: #333;
+        text-decoration: none;
+        border-radius: 10px;
+        font-weight: bold;
+        font-size: 1.1em;
+        transition: background 0.3s ease;
+      }
+
+      .btn:hover {
+        background: #f0f0f0;
+      }
+
+      .card.voice .btn:hover {
+        background: #667eea;
+        color: white;
+      }
+
+      .card.chatbot .btn:hover {
+        background: #11998e;
+        color: white;
+      }
+
+      .footer {
+        margin-top: 50px;
+        padding-top: 30px;
+        border-top: 2px solid #e0e0e0;
+        color: #999;
+        font-size: 0.9em;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🤖 AI Agent Discovery</h1>
+      <p>
+        Choose the questionnaire that matches your project needs. Each form
+        takes approximately 20-35 minutes to complete.
+      </p>
+
+      <div class="cards">
+        <div class="card voice">
+          <h2>📞 Voice Agent</h2>
+          <p>
+            For phone-based AI assistants that handle inbound/outbound calls
+            using speech recognition and natural language processing.
+          </p>
+          <a href="/voice-agent-questionnaire.html" class="btn"
+            >Start Voice Agent Form</a
+          >
+        </div>
+
+        <div class="card chatbot">
+          <h2>💬 Chatbot</h2>
+          <p>
+            For text-based AI assistants on websites, mobile apps, or messaging
+            platforms like WhatsApp and Messenger.
+          </p>
+          <a href="/chatbot-questionnaire.html" class="btn"
+            >Start Chatbot Form</a
+          >
+        </div>
+      </div>
+
+      <div class="footer">
+        <p>Your responses will be securely stored and reviewed by our team.</p>
+      </div>
+    </div>
+  </body>
+</html>

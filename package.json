@@ -1,0 +1,17 @@
+{
+  "name": "ai-agent-questionnaires",
+  "version": "1.0.0",
+  "description": "Voice Agent and Chatbot Discovery Questionnaires",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo 'No build step required'"
+  },
+  "dependencies": {
+    "googleapis": "^128.0.0"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=18.x"
+  }
+}
+

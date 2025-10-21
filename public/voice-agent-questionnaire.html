@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Voice Agent Implementation - Discovery Questionnaire</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 20px;
+        color: #333;
+      }
+
+      .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+      }
+
+      .header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 40px;
+        text-align: center;
+      }
+
+      .header h1 {
+        font-size: 2.5em;
+        margin-bottom: 10px;
+      }
+
+      .header p {
+        font-size: 1.2em;
+        opacity: 0.9;
+      }
+
+      .form-section {
+        padding: 40px;
+      }
+
+      .section {
+        margin-bottom: 40px;
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 30px;
+        border-left: 5px solid #667eea;
+      }
+
+      .section-title {
+        font-size: 1.8em;
+        color: #667eea;
+        margin-bottom: 25px;
+        font-weight: 600;
+      }
+
+      .question {
+        margin-bottom: 25px;
+      }
+
+      .question-label {
+        font-weight: 600;
+        color: #444;
+        margin-bottom: 12px;
+        font-size: 1.1em;
+        display: block;
+      }
+
+      .text-input,
+      .text-area {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #ddd;
+        border-radius: 6px;
+        font-size: 1em;
+        font-family: inherit;
+        transition: border-color 0.3s ease;
+      }
+
+      .text-input:focus,
+      .text-area:focus {
+        outline: none;
+        border-color: #667eea;
+      }
+
+      .text-area {
+        min-height: 100px;
+        resize: vertical;
+      }
+
+      .radio-group,
+      .checkbox-group {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      .radio-option,
+      .checkbox-option {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      input[type="radio"],
+      input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+      }
+
+      .submit-button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px 50px;
+        font-size: 1.3em;
+        font-weight: bold;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        margin: 40px auto;
+        display: block;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .submit-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+      }
+
+      .submit-button:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+      }
+
+      .message {
+        display: none;
+        padding: 20px;
+        border-radius: 10px;
+        margin: 20px 40px;
+        text-align: center;
+        font-size: 1.1em;
+      }
+
+      .message.success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+
+      .message.error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+
+      .footer {
+        background: #2c3e50;
+        color: white;
+        padding: 30px;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>Voice Agent Implementation</h1>
+        <p>Discovery Questionnaire</p>
+      </div>
+
+      <div id="successMessage" class="message success"></div>
+      <div id="errorMessage" class="message error"></div>
+
+      <form id="voiceAgentForm" class="form-section">
+        <!-- Section 1: Project Overview -->
+        <div class="section">
+          <h2 class="section-title">1. Project Overview</h2>
+
+          <div class="question">
+            <label class="question-label" for="Purpose"
+              >What is the main purpose of this voice agent?</label
+            >
+            <textarea
+              id="Purpose"
+              name="Purpose"
+              class="text-area"
+              placeholder="e.g., Customer support, sales, appointment scheduling..."
+              required
+            ></textarea>
+          </div>
+
+          <div class="question">
+            <label class="question-label" for="ProblemToSolve"
+              >What problem are you trying to solve?</label
+            >
+            <textarea
+              id="ProblemToSolve"
+              name="ProblemToSolve"
+              class="text-area"
+              placeholder="Describe the current challenges..."
+              required
+            ></textarea>
+          </div>
+
+          <div class="question">
+            <label class="question-label" for="SuccessCriteria"
+              >What does success look like?</label
+            >
+            <textarea
+              id="SuccessCriteria"
+              name="SuccessCriteria"
+              class="text-area"
+              placeholder="e.g., Reduce wait times, increase bookings, improve customer satisfaction..."
+              required
+            ></textarea>
+          </div>
+        </div>
+
+        <!-- Section 2: Call Configuration -->
+        <div class="section">
+          <h2 class="section-title">2. Call Configuration</h2>
+
+          <div class="question">
+            <label class="question-label">Will the voice agent handle:</label>
+            <div class="radio-group">
+              <div class="radio-option">
+                <input
+                  type="radio"
+                  id="calltype-inbound"
+                  name="CallType"
+                  value="Inbound calls (customers call in)"
+                  required
+                />
+                <label for="calltype-inbound"
+                  >Inbound calls (customers call in)</label
+                >
+              </div>
+              <div class="radio-option">
+                <input
+                  type="radio"
+                  id="calltype-outbound"
+                  name="CallType"
+                  value="Outbound calls (agent calls customers)"
+                />
+                <label for="calltype-outbound"
+                  >Outbound calls (agent calls customers)</label
+                >
+              </div>
+              <div class="radio-option">
+                <input
+                  type="radio"
+                  id="calltype-both"
+                  name="CallType"
+                  value="Both"
+                />
+                <label for="calltype-both">Both</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="question">
+            <label class="question-label" for="ExpectedCallVolume"
+              >Expected call volume:</label
+            >
+            <input
+              type="text"
+              id="ExpectedCallVolume"
+              name="ExpectedCallVolume"
+              class="text-input"
+              placeholder="Approximately ___ calls per day"
+              required
+            />
+          </div>
+
+          <div class="question">
+            <label class="question-label" for="PeakTimes">Peak times:</label>
+            <input
+              type="text"
+              id="PeakTimes"
+              name="PeakTimes"
+              class="text-input"
+              placeholder="e.g., 9am-12pm weekdays"
+            />
+          </div>
+
+          <div class="question">
+            <label class="question-label" for="InboundMethod"
+              >For Inbound: How should calls reach the agent?</label
+            >
+            <textarea
+              id="InboundMethod"
+              name="InboundMethod"
+              class="text-area"
+              placeholder="e.g., Direct phone number, IVR menu, overflow from call center..."
+            ></textarea>
+          </div>
+
+          <div class="question">
+            <label class="question-label" for="InboundOtherSpecify"
+              >Inbound - Other details:</label
+            >
+            <input
+              type="text"
+              id="InboundOtherSpecify"
+              name="InboundOtherSpecify"
+              class="text-input"
+              placeholder="Any additional inbound details..."
+            />
+          </div>
+
+          <div class="question">
+            <label class="question-label" for="OutboundType"
+              >For Outbound: What type of calls?</label
+            >
+            <textarea
+              id="OutboundType"
+              name="OutboundType"
+              class="text-area"
+              placeholder="e.g., Cold outreach, follow-ups, appointment reminders..."
+            ></textarea>
+          </div>
+
+          <div class="question">
+            <label class="question-label" for="OutboundOtherSpecify"
+              >Outbound - Other details:</label
+            >
+            <input
+              type="text"
+              id="OutboundOtherSpecify"
+              name="OutboundOtherSpecify"
+              class="text-input"
+              placeholder="Any additional outbound details..."
+            />
+          </div>
+        </div>
+
+        <!-- Section 3: Conversation Design -->
+        <div class="section">
+          <h2 class="section-title">3. Conversation Design</h2>
+
+          <div class="question">
+            <label class="question-label"
+              >How complex is the conversation?</label
+            >
+            <div class="radio-group">
+              <div class="radio-option">
+                <input
+                  type="radio"
+                  id="complexity-simple"
+                  name="ConversationComplexity"
+                  value="Simple & straightforward"
+                  required
+                />
+                <label for="complexity-simple"
+                  >Simple & straightforward (e.g., "confirm appointment")</label
+                >
+              </div>
+              <div class="radio-option">
+                <input
+                  type="radio"
+                  id="complexity-moderate"
+                  name="ConversationComplexity"
+                  value="Moderate"
+                />
+                <label for="complexity-moderate"
+                  >Moderate (some back-and-forth, handle a few scenarios)</label
+                >
+              </div>
+              <div class="radio-option">
+                <input
+                  type="radio"
+                  id="complexity-complex"
+                  name="ConversationComplexity"
+                  value="Complex"
+                />
+                <label for="complexity-complex"
+                  >Complex (dynamic conversation, many possible paths)</label
+                >
+              </div>
+            </div>
+          </div>
+
+          <div class="question">
+            <label class="question-label"
+              >Do you have a script or conversation flow already?</label
+            >
+            <div class="radio-group">
+              <div class="radio-option">
+                <input
+                  type="radio"
+                  id="script-detailed"
+                  name="HasScript"
+                  value="Yes, detailed script"
+                  required
+                />
+                <label for="script-detailed"
+                  >Yes, we have a detailed script</label
+                >
+              </div>
+              <div class="radio-option">
+                <input
+                  type="radio"
+                  id="script-outline"
+                  name="HasScript"
+                  value="Rough outline"
+                />
+                <label for="script-outline">We have a rough outline</label>
+              </div>
+              <div class="radio-option">
+                <input
+                  type="radio"
+                  id="script-none"
+                  name="HasScript"
+                  value="No, need help"
+                />
+                <label for="script-none">No, need help creating one</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="question">
+            <label class="question-label" for="PrimaryLanguage"
+              >Primary language:</label
+            >
+            <input
+              type="text"
+              id="PrimaryLanguage"
+              name="PrimaryLanguage"
+              class="text-input"
+              placeholder="e.g., English"
+              required
+            />
+          </div>
+
+          <div class="question">
+            <label class="question-label" for="AdditionalLanguage"
+              >Additional languages (if any):</label
+            >
+            <input
+              type="text"
+              id="AdditionalLanguage"
+              name="AdditionalLanguage"
+              class="text-input"
+              placeholder="e.g., Spanish, French"
+            />
+          </div>
+
+          <div class="question">
+            <label class="question-label">Voice preference:</label>
+            <div class="radio-group">
+              <div class="radio-option">
+                <input
+                  type="radio"
+                  id="voice-male"
+                  name="VoicePreference"
+                  value="Male"
+                />
+                <label for="voice-male">Male</label>
+              </div>
+              <div class="radio-option">
+                <input
+                  type="radio"
+                  id="voice-female"
+                  name="VoicePreference"
+                  value="Female"
+                />
+                <label for="voice-female">Female</label>
+              </div>
+              <div class="radio-option">
+                <input
+                  type="radio"
+                  id="voice-none"
+                  name="VoicePreference"
+                  value="No preference"
+                />
+                <label for="voice-none">No preference</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="question">
+            <label class="question-label">Tone preference:</label>
+            <div class="radio-group">
+              <div class="radio-option">
+                <input
+                  type="radio"
+                  id="tone-professional"
+                  name="TonePreference"
+                  value="Professional"
+                />
+                <label for="tone-professional">Professional</label>
+              </div>
+              <div class="radio-option">
+                <input
+                  type="radio"
+                  id="tone-friendly"
+                  name="TonePreference"
+                  value="Friendly & casual"
+                />
+                <label for="tone-friendly">Friendly & casual</label>
+              </div>
+              <div class="radio-option">
+                <input
+                  type="radio"
+                  id="tone-other"
+                  name="TonePreference"
+                  value="Other"
+                />
+                <label for="tone-other">Other (specify below)</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="question">
+            <label class="question-label" for="ToneOtherDescribe"
+              >If other tone, please describe:</label
+            >
+            <input
+              type="text"
+              id="ToneOtherDescribe"
+              name="ToneOtherDescribe"
+              class="text-input"
+              placeholder="Describe the desired tone..."
+            />
+          </div>
+
+          <div class="question">
+            <label class="question-label">Conversation style:</label>
+            <div class="radio-group">
+              <div class="radio-option">
+                <input
+                  type="radio"
+                  id="style-natural"
+                  name="ConversationStyle"
+                  value="Natural, AI-driven"
+                />
+                <label for="style-natural"
+                  >Natural, AI-driven conversation</label
+                >
+              </div>
+              <div class="radio-option">
+                <input
+                  type="radio"
+                  id="style-structured"
+                  name="ConversationStyle"
+                  value="Structured, scripted"
+                />
+                <label for="style-structured"
+                  >Structured, follow specific script</label
+                >
+              </div>
+              <div class="radio-option">
+                <input
+                  type="radio"
+                  id="style-hybrid"
+                  name="ConversationStyle"
+                  value="Hybrid"
+                />
+                <label for="style-hybrid">Hybrid approach</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 4: Information & Actions -->
+        <div class="section">
+          <h2 class="section-title">4. Information & Actions</h2>
+
+          <div class="question">
+            <label class="question-label" for="InfoToCollect"
+              >What information does the agent need to collect from
+              callers?</label
+            >
+            <textarea
+              id="InfoToCollect"
+              name="InfoToCollect"
+              class="text-area"
+              placeholder="e.g., name, phone, reason for call, account number..."
+              required
+            ></textarea>
+          </div>
+
+          <div class="question">
+            <label class="question-label" for="InfoToProvide"
+              >What information should the agent provide?</label
+            >
+            <textarea
+              id="InfoToProvide"
+              name="InfoToProvide"
+              class="text-area"
+              placeholder="e.g., business hours, pricing, order status..."
+              required
+            ></textarea>
+          </div>
+
+          <div class="question">
+            <label class="question-label" for="AgentActions"
+              >What actions should the agent take during calls?</label
+            >
+            <textarea
+              id="AgentActions"
+              name="AgentActions"
+              class="text-area"
+              placeholder="e.g., Schedule appointments, update records, send emails..."
+              required
+            ></textarea>
+          </div>
+
+          <div class="question">
+            <label class="question-label" for="OtherActionsSpecify"
+              >Other actions (please specify):</label
+            >
+            <input
+              type="text"
+              id="OtherActionsSpecify"
+              name="OtherActionsSpecify"
+              class="text-input"
+              placeholder="Any other specific actions..."
+            />
+          </div>
+        </div>
+
+        <!-- Section 5: Integrations & Data -->
+        <div class="section">
+          <h2 class="section-title">5. Integrations & Data</h2>
+
+          <div class="question">
+            <label class="question-label" for="SystemAccessNeeded"
+              >Does the agent need access to existing systems?</label
+            >
+            <textarea
+              id="SystemAccessNeeded"
+              name="SystemAccessNeeded"
+              class="text-area"
+              placeholder="e.g., CRM (Salesforce), Calendar (Google Calendar), Customer database..."
+              required
+            ></textarea>
+          </div>
+
+          <div class="question">
+            <label class="question-label" for="SystemAccessDetails"
+              >System access details:</label
+            >
+            <textarea
+              id="SystemAccessDetails"
+              name="SystemAccessDetails"
+              class="text-area"
+              placeholder="Provide details about system integrations needed..."
+            ></textarea>
+          </div>
+
+          <div class="question">
+            <label class="question-label"
+              >Should the agent access customer history/previous
+              interactions?</label
+            >
+            <div class="radio-group">
+              <div class="radio-option">
+                <input
+                  type="radio"
+                  id="history-yes-existing"
+                  name="UseCustomerHistory"
+                  value="Yes, from existing system"
+                />
+                <label for="history-yes-existing"
+                  >Yes, pull from existing system</label
+                >
+              </div>
+              <div class="radio-option">
+                <input
+                  type="radio"
+                  id="history-yes-project"
+                  name="UseCustomerHistory"
+                  value="Yes, within this project"
+                />
+                <label for="history-yes-project"
+                  >Yes, remember within this project</label
+                >
+              </div>
+              <div class="radio-option">
+                <input
+                  type="radio"
+                  id="history-no"
+                  name="UseCustomerHistory"
+                  value="No, independent"
+                />
+                <label for="history-no"
+                  >No, treat each call independently</label
+                >
+              </div>
+            </div>
+          </div>
+
+          <div class="question">
+            <label class="question-label" for="KnowledgeBaseNeeded"
+              >Does the agent need a knowledge base?</label
+            >
+            <textarea
+              id="KnowledgeBaseNeeded"
+              name="KnowledgeBaseNeeded"
+              class="text-area"
+              placeholder="e.g., FAQs, product info, company policies, technical docs..."
+            ></textarea>
+          </div>
+        </div>
+
+        <button type="submit" class="submit-button" id="submitBtn">
+          Submit Questionnaire
+        </button>
+      </form>
+
+      <div class="footer">
+        <p><strong>Voice Agent Implementation Discovery</strong></p>
+        <p>Your responses will be securely stored and reviewed by our team.</p>
+      </div>
+    </div>
+
+    <script>
+      document
+        .getElementById("voiceAgentForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          const submitBtn = document.getElementById("submitBtn");
+          const successMsg = document.getElementById("successMessage");
+          const errorMsg = document.getElementById("errorMessage");
+
+          // Hide messages
+          successMsg.style.display = "none";
+          errorMsg.style.display = "none";
+
+          // Disable button
+          submitBtn.disabled = true;
+          submitBtn.textContent = "Submitting...";
+
+          try {
+            // Collect form data
+            const formData = new FormData(this);
+            const data = {};
+
+            for (let [key, value] of formData.entries()) {
+              data[key] = value;
+            }
+
+            // Send to API
+            const response = await fetch("/api/submit-voice-agent", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(data),
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+              successMsg.textContent =
+                "✅ Success! Your questionnaire has been submitted. Thank you!";
+              successMsg.style.display = "block";
+              successMsg.scrollIntoView({
+                behavior: "smooth",
+                block: "center",
+              });
+              this.reset();
+            } else {
+              throw new Error(result.error || "Submission failed");
+            }
+          } catch (error) {
+            console.error("Error:", error);
+            errorMsg.textContent =
+              "❌ Error: " + error.message + ". Please try again.";
+            errorMsg.style.display = "block";
+            errorMsg.scrollIntoView({ behavior: "smooth", block: "center" });
+          } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Submit Questionnaire";
+          }
+        });
+    </script>
+  </body>
+</html>
