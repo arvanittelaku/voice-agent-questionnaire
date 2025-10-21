@@ -70,8 +70,8 @@ module.exports = async (req, res) => {
 
     // Append row to Google Sheet
     await sheets.spreadsheets.values.append({
-      spreadsheetId: process.env.GOOGLE_SHEET_ID,
-      range: 'Chatbot!A:AH', // Adjust sheet name if different
+      spreadsheetId: process.env.GOOGLE_SHEET_ID_CHATBOT || process.env.GOOGLE_SHEET_ID,
+      range: 'A:AH', // Write to first sheet
       valueInputOption: 'USER_ENTERED',
       resource: {
         values: [row],

@@ -63,8 +63,8 @@ module.exports = async (req, res) => {
 
     // Append row to Google Sheet
     await sheets.spreadsheets.values.append({
-      spreadsheetId: process.env.GOOGLE_SHEET_ID,
-      range: 'Voice Agent!A:AA', // Adjust sheet name if different
+      spreadsheetId: process.env.GOOGLE_SHEET_ID_VOICE || process.env.GOOGLE_SHEET_ID,
+      range: 'A:AA', // Write to first sheet
       valueInputOption: 'USER_ENTERED',
       resource: {
         values: [row],
